@@ -1,0 +1,30 @@
+name: 'Linting'
+description: 'Lint Python code with pre-commit'
+inputs:
+  python-version:
+    required: false
+    description: 'Which Python version to install'
+    default: '3.9'
+  pre-commit-cache-key:
+    required: false
+    description: 'The cache index. Should be indented to reset cache.'
+    default: 'pre-commit-0'
+outputs: {}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ inputs.python-version }}
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: key-${{ inputs.pre-commit-cache-key }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          ${{ runner.os }}-
+    - run: python -m pip install pre-commit
+      shell: bash
+    - run: pre-commit run --all-files
+      shell: bash
