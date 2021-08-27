@@ -1,0 +1,50 @@
+name: 'Publish'
+description: 'Publish a Python package'
+inputs:
+  token:
+    required: true
+    description: 'Token to use for repository auth'
+  python-version:
+    required: false
+    description: 'Which Python version to install'
+    default: '3.9'
+  repository-url:
+    required: false
+    description: 'The URL of the package repository'
+    default: 'https://test.pypi.org/legacy/'
+  overwrite-repository:
+    required: false
+    default: 'false'
+    description: "If 'true' will configure and push to the repository url passed. Repository URL cloud be 'https://test.pypi.org/legacy/' for test-pypi, but could also point at a private repo"
+  poetry-cache-key:
+    required: false
+    description: 'The cache index. Should be indented to reset cache.'
+    default: 'poetry-0'
+outputs: {}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Load cached Poetry installation
+      uses: actions/cache@v2
+      with:
+        # This path assumes the workflow is run on an ubuntu runner
+        path: ~/.local
+        key: key-${{ inputs.poetry-cache-key }}
+    - uses: snok/install-poetry@v1
+    - name: Publish package
+      shell: bash
+      run: |
+        if echo ${{ inputs.overwrite-repository }} | grep -c "false"
+        then
+          echo "Using default repository (PyPi)"
+          poetry config pypi-token.pypi ${{ inputs.token }}
+          poetry publish --build --no-interaction
+        else
+          poetry config repositories.custom ${{ inputs.repository-url }}
+          poetry config pypi-token.custom ${{ inputs.token }}
+          poetry publish --build --no-interaction --repository custom
+        fi
