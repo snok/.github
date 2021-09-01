@@ -16,7 +16,7 @@ jobs:
   codecov:
     runs-on: ubuntu-latest
     steps:
-      - uses: snok/.github/workflows/codecov
+      - uses: snok/.github/workflows/codecov@main
         with:
           source-dir: src
           pip-cache-key: 0
