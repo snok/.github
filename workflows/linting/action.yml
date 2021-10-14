@@ -17,6 +17,8 @@ runs:
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ inputs.python-version }}
+    - run: pip install -U pip
+      shell: bash
     - uses: actions/cache@v2
       with:
         path: ~/.cache/pip
@@ -29,6 +31,10 @@ runs:
     - name: Run pre-commit
       run: pre-commit run --all-files
       shell: bash
-    - name: Check Poetry lockfile
-      run: pip install poetry && python -c "from poetry.factory import Factory; l = Factory().create_poetry('.').locker; exit(0) if l.is_locked() and l.is_fresh() else exit(1)"  && echo 'OK'
+    - uses: actions/cache@v2
+      with:
+        path: ~/.local
+        key: key-1
+    - uses: snok/install-poetry@v1
+    - run: python -c "from poetry.factory import Factory; l = Factory().create_poetry('.').locker; exit(0) if l.is_locked() and l.is_fresh() else exit(1)"  && echo 'OK'
       shell: bash
