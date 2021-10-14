@@ -36,5 +36,5 @@ runs:
         path: ~/.local
         key: key-1
     - uses: snok/install-poetry@v1
-    - run: python -c "from poetry.factory import Factory; l = Factory().create_poetry('.').locker; exit(0) if l.is_locked() and l.is_fresh() else exit(1)"  && echo 'OK'
+    - run: echo "Checking Poetry lockfile" && python -c "from poetry.factory import Factory; l = Factory().create_poetry('.').locker; exit(0) if l.is_locked() and l.is_fresh() else exit(1)"  && echo 'OK'
       shell: bash
